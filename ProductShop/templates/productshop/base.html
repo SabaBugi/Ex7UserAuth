@@ -1,0 +1,37 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Shop</title>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <img src="{% static 'images/logo.png' %}" alt="Shop Logo">
+            </div>
+            <ul>
+                <li><a href="{% url 'product_shop:home' %}">Home 🏠</a></li>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'product_shop:product_page' %}">Product Page 🛒</a></li>
+                    {% if user.is_staff %}
+                        <li><a href="{% url 'admin:index' %}">Admin Panel ⚙️</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'users:logout_user' %}">Logout 🚪</a></li>
+                {% else %}
+                    <li><a href="{% url 'users:login_user' %}">Login 🔑</a></li>
+                    <li><a href="{% url 'users:register_user' %}">Register 📝</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        <div class="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>

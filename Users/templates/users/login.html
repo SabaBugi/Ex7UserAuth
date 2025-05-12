@@ -1,0 +1,34 @@
+{% extends "productshop/base.html" %}
+{% load static %}
+{% block content %}
+<div class="login-container" style="display: flex; justify-content: center; align-items: center; height: 100vh; flex-direction: column; overflow: hidden; margin: 0;">
+    <h2 style="margin-bottom: 20px;">Login</h2>
+    <form method="post" style="width: 300px; display: flex; flex-direction: column; gap: 15px;">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Login</button>
+    </form>
+    <p style="margin-top: 15px;">Don't have an account? <a href="{% url 'users:register_user' %}">Register here</a></p>
+</div>
+
+{% if messages %}
+    <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        {% for message in messages %}
+            <div style="background-color: #d4edda; color: #155724; padding: 10px; border: 1px solid #c3e6cb; border-radius: 5px; margin-bottom: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+<script>
+    setTimeout(function() {
+        var notificationContainer = document.getElementById("notification-container");
+        if (notificationContainer) {
+            notificationContainer.style.display = "none";
+        }
+    }, 3000); // 3 seconds timeout
+</script>
+
+{% endblock %}

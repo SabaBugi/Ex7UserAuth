@@ -1,0 +1,242 @@
+/* General Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+    color: #333;
+}
+
+h1, h2 {
+    color: #444;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Container Layout */
+.container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex; /* Use flexbox for logo and list layout */
+    flex-direction: column; /* Stack logo and list vertically */
+    align-items: center; /* Center items horizontally */
+}
+
+.sidebar .logo {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.sidebar .logo img {
+    max-width: 150px; /* Adjust as needed */
+    height: auto;
+    display: block;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%; /* Make the list take full width of the sidebar */
+}
+
+.sidebar ul li {
+    margin: 10px 0; /* Reduced margin for list items */
+}
+
+.sidebar ul li a {
+    display: block;
+    padding: 10px 20px;
+    text-decoration: none;
+    color: white; /* Links should be white in the dark sidebar */
+    font-weight: bold;
+    border-radius: 5px; /* Optional: add rounded corners to links */
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+.sidebar ul li a:hover {
+    background-color: rgba(255, 255, 255, 0.1); /* Lighter background on hover */
+    color: #1abc9c; /* Highlight color on hover */
+}
+
+/* Content Styles */
+.content {
+    flex: 1;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table th, table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+table th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+table tr:hover {
+    background-color: #e9ecef;
+}
+
+/* Button Styles */
+button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Modal Styles */
+#editModal, #deleteModal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 400px;
+    border-radius: 8px;
+}
+
+#editModal h2, #deleteModal h2 {
+    margin-top: 0;
+}
+
+#editModal button, #deleteModal button {
+    margin-top: 10px;
+}
+
+#editModal button[type="submit"], #deleteModal button[type="submit"] {
+    background-color: #28a745;
+}
+
+#editModal button[type="submit"]:hover, #deleteModal button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+#editModal button[type="button"], #deleteModal button[type="button"] {
+    background-color: #dc3545;
+}
+
+#editModal button[type="button"]:hover, #deleteModal button[type="button"]:hover {
+    background-color: #c82333;
+}
+
+/* Form Styles */
+form label {
+    display: inline-block;
+    width: 100px;
+    font-weight: bold;
+}
+
+form input, form textarea {
+    width: 300px;
+    padding: 5px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc; /* Added border for better visual */
+    border-radius: 4px; /* Optional: rounded corners for inputs */
+    box-sizing: border-box; /* Ensure padding doesn't affect overall width */
+}
+
+form textarea {
+    height: 100px;
+}
+
+form button {
+    margin-top: 10px;
+}
+
+button.delete-button {
+    background-color: #dc3545; 
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 0.9em;
+    margin-left: 5px; 
+}
+
+button.delete-button:hover {
+    background-color: #c82333; 
+}
+
+.notification-success {
+    background-color: #d4edda;
+    color: #155724;
+    padding: 10px;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.notification-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+#notification-container {
+    max-width: 300px;
+    word-wrap: break-word;
+}
