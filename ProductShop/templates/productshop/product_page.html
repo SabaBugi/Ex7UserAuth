@@ -5,58 +5,118 @@
     <h1>Products</h1>
 
     {% if perms.ProductShop.add_product %}
-    <h2>Add New Product</h2>
-    <form method="post" style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;">
+    <div style="display: flex; gap: 50px; margin-bottom: 25px; align-items: flex-start;">
+        
+        <form method="post" style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;" name="add_product_form">
+            {% csrf_token %}
+            <input type="hidden" name="add_product" value="true">
+            <h3>Add Product</h3>
+            <div>
+                <label for="name" style="display: inline-block; width: 100px;">Name:</label>
+                <input type="text" id="name" name="name" style="width: 300px;" required step="0.01">
+            </div>
+            <div>
+                <label for="price" style="display: inline-block; width: 100px;">Price:</label>
+                <input type="number" id="price" name="price" style="width: 300px;" required step="0.01">
+            </div>
+            <div>
+                <label for="description" style="display: inline-block; width: 100px; vertical-align: top;">Description:</label>
+                <textarea id="description" name="description" style="width: 300px; height: 80px;"></textarea>
+            </div>
+            <button type="submit" style="margin-left: 100px; margin-top: 10px; align-self: flex-start;">Add Product</button>
+        </form>
+
+        <div style="border-left: 2px solid #171616; height: 350px; align-self: center;"></div>
+
+        <form method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 10px; align-items: flex-start;" name="import_product_form">
+            {% csrf_token %}
+            <input type="hidden" name="import_csv" value="true">
+            <h3>Import Products from CSV</h3>
+            <div>
+                <label for="csv_file" style="display: inline-block; width: 100px;">CSV File:</label>
+                <input type="file" name="csv_file" accept=".csv" required>
+            </div>
+            <button type="submit" style="margin-left: 100px; margin-top: 10px; align-self: flex-start;">Import Products</button>
+        </form>
+    </div>
+    {% endif %}
+
+    {% if perms.ProductShop.delete_product %}
+    <form method="post" id="bulk-delete-form" onsubmit="return confirmBulkDelete()">
         {% csrf_token %}
-        <input type="hidden" name="add_product" value="true">
-        <div>
-            <label for="name" style="display: inline-block; width: 100px;">Name:</label>
-            <input type="text" id="name" name="name" style="width: 300px;" required step="0.01">
-        </div>
-        <div>
-            <label for="price" style="display: inline-block; width: 100px;">Price:</label>
-            <input type="number" id="price" name="price" style="width: 300px;" required step="0.01">
-        </div>
-        <div>
-            <label for="description" style="display: inline-block; width: 100px; vertical-align: top;">Description:</label>
-            <textarea id="description" name="description" style="width: 300px; height: 80px;"></textarea>
-        </div>
-        <button type="submit" style="margin-left: 100px; margin-top: 10px; align-self: flex-start;">Add Product</button>
+        <input type="hidden" name="bulk_delete" value="true">
+        <button type="submit" style="margin-bottom: 10px; background-color: #dc3545; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9em;">Delete Selected Products</button>
     </form>
     {% endif %}
 
-    <h2>Product List</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Description</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for product in products %}
-            <tr>
-                <td>{{ product.id }}</td>
-                <td>{{ product.name }}</td>
-                <td>{{ product.price|floatformat:2 }}₾</td>
-                <td>{{ product.description }}</td>
-                <td>
-                    {% if perms.ProductShop.change_product %}
-                    <button onclick="openEditModal({{ product.id }}, '{{ product.name }}', '{{ product.price }}', '{{ product.description|escapejs }}')">Edit</button>
-                    {% endif %}
+    <div style="max-height: 70vh; overflow-y: auto; border: 1px solid #ccc; margin-bottom: 10px;">
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
                     {% if perms.ProductShop.delete_product %}
-                    <button class="delete-button" onclick="openDeleteModal({{ product.id }})">Delete</button>
+                        <th><input type="checkbox" onclick="toggleSelectAll(this)"></th>
                     {% endif %}
-                </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="5">No products available.</td></tr>
-            {% endfor %}
-        </tbody>
-    </table>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    {% if perms.ProductShop.delete_product %}
+                        <td><input type="checkbox" name="selected_products" value="{{ product.id }}"></td>
+                    {% endif %}
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.price|floatformat:2 }}₾</td>
+                    <td>{{ product.description }}</td>
+                    <td>
+                        {% if perms.ProductShop.change_product %}
+                            <button onclick="openEditModal({{ product.id }}, '{{ product.name }}', '{{ product.price }}', '{{ product.description|escapejs }}')">Edit</button>
+                        {% endif %}
+                        {% if perms.ProductShop.delete_product %}
+                            <button class="delete-button" onclick="openDeleteModal({{ product.id }})">Delete</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6">No products available.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+    function confirmBulkDelete() {
+        if (!confirm("Are you sure you want to delete the selected products?")) {
+            return false;
+        }
+        
+        // Clear any previous hidden inputs
+        document.querySelectorAll('#bulk-delete-form input[name="selected_products"]').forEach(e => e.remove());
+
+        // Get all checkboxes
+        const checkboxes = document.querySelectorAll('input[name="selected_products"]:checked');
+        
+        // Append each selected ID to the form as hidden input
+        checkboxes.forEach(checkbox => {
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'selected_products';
+            hiddenInput.value = checkbox.value;
+            document.getElementById('bulk-delete-form').appendChild(hiddenInput);
+        });
+
+        return true; // Allow the form to submit
+    }
+    </script>
+
+
+    <div style="height: 30px;"></div>
+
 
     <div id="editModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black; z-index:1000;">
         <h2>Edit Product</h2>
@@ -87,6 +147,58 @@
         </form>
     </div>
 
+    <!-- Bulk Delete Modal -->
+    <div id="bulkDeleteModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black; z-index:1000;">
+        <h2>Delete Selected Products</h2>
+        <p>Are you sure you want to delete the selected products?</p>
+        <form method="post" id="bulk-delete-modal-form">
+            {% csrf_token %}
+            <input type="hidden" name="bulk_delete" value="true">
+            <div id="bulk-delete-hidden-inputs"></div>
+            <button type="submit" style="background-color: #dc3545; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9em;">Yes, Delete</button>
+            <button type="button" onclick="closeBulkDeleteModal()" style="background-color: #6c757d; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9em;">Cancel</button>
+        </form>
+    </div>
+
+        <!-- No Selection Modal -->
+    <div id="noSelectionModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); background-color:white; padding:20px; border:1px solid black; z-index:1000;">
+        <h2>Warning</h2>
+        <p>Please select at least one product to delete.</p>
+        <button type="button" onclick="closeNoSelectionModal()" style="background-color: #6c757d; color: white; border: none; padding: 8px 12px; cursor: pointer; border-radius: 4px; font-size: 0.9em;">OK</button>
+    </div>
+
+    <script>
+        function confirmBulkDelete() {
+            // Clear any previous hidden inputs
+            document.getElementById('bulk-delete-hidden-inputs').innerHTML = '';
+
+            // Get all selected checkboxes
+            const checkboxes = document.querySelectorAll('input[name="selected_products"]:checked');
+            if (checkboxes.length === 0) {
+                // Open the no selection modal
+                document.getElementById('noSelectionModal').style.display = 'block';
+                return false;
+            }
+
+            // Append each selected ID to the modal form as hidden input
+            checkboxes.forEach(checkbox => {
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'selected_products';
+                hiddenInput.value = checkbox.value;
+                document.getElementById('bulk-delete-hidden-inputs').appendChild(hiddenInput);
+            });
+
+            // Open the bulk delete modal
+            document.getElementById('bulkDeleteModal').style.display = 'block';
+            return false; // Prevent form submission
+        }
+
+        function closeNoSelectionModal() {
+            document.getElementById('noSelectionModal').style.display = 'none';
+        }
+    </script>
+
     <script>
         function openEditModal(id, name, price, description) {
             document.getElementById('editModal').style.display = 'block';
@@ -109,4 +221,25 @@
             document.getElementById('deleteModal').style.display = 'none';
         }
     </script>
+    
+    {% if messages %}
+    <div id="notification-container" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        {% for message in messages %}
+            <div style="background-color: #d4edda; color: #155724; padding: 10px; border: 1px solid #c3e6cb; border-radius: 5px; margin-bottom: 10px; box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    <script>
+        setTimeout(function() {
+            var notificationContainer = document.getElementById("notification-container");
+            if (notificationContainer) {
+                notificationContainer.style.display = "none";
+            }
+        }, 3000); // 3 seconds timeout
+    </script>
+    
 {% endblock %}

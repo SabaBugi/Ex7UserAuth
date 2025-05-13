@@ -81,6 +81,8 @@ a:hover {
     padding: 20px;
     background-color: #ffffff;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    height: 100vh;
 }
 
 /* Table Styles */
@@ -233,7 +235,7 @@ html, body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    height: 100%;
+    height: 100vh;
 }
 
 #notification-container {

@@ -1,7 +1,10 @@
+import csv
 from django.shortcuts import render, redirect
 from .models import Product
+from .forms import ProductUploadForm
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
+from django.contrib import messages
 
 
 def home(request):
@@ -9,15 +12,6 @@ def home(request):
 
 @login_required
 def product_page(request):
-    user = request.user
-    print("User:", user)
-    print("Authenticated:", user.is_authenticated)
-    print("Add Permission:", user.has_perm('productshop.add_product'))
-    print("Change Permission:", user.has_perm('productshop.change_product'))
-    print("Delete Permission:", user.has_perm('productshop.delete_product'))
-    
-    # Print all permissions for this user:
-    print("All Permissions:", user.get_all_permissions())
     products = Product.objects.all()
     context = {'products': products, 'request': request}
 
@@ -29,6 +23,24 @@ def product_page(request):
             price = request.POST['price']
             description = request.POST['description']
             Product.objects.create(name=name, price=price, description=description)
+
+        elif 'import_csv' in request.POST:
+            form = ProductUploadForm(request.POST, request.FILES)
+            if form.is_valid():
+                csv_file = request.FILES['csv_file']
+                try:
+                    decoded_file = csv_file.read().decode('utf-8').splitlines()
+                    reader = csv.DictReader(decoded_file)
+                    for row in reader:
+                        Product.objects.create(
+                            name=row['name'],
+                            price=row['price'],
+                            description=row['description']
+                        )
+                    messages.success(request, "Products imported successfully.")
+                except Exception as e:
+                    messages.error(request, f"Failed to import products: {e}")
+            return redirect('product_shop:product_page')
 
         elif 'edit_product' in request.POST:
             if not request.user.has_perm('ProductShop.change_product'):
@@ -52,7 +64,20 @@ def product_page(request):
                 product.delete()
             except Product.DoesNotExist:
                 pass
+        
+        elif 'bulk_delete' in request.POST:
+            if not request.user.has_perm('ProductShop.delete_product'):
+                return HttpResponseForbidden("You do not have permission to delete products.")
+            
+            selected_ids = request.POST.getlist('selected_products')
+            
+            if selected_ids:
+                Product.objects.filter(id__in=selected_ids).delete()
+                messages.success(request, f"{len(selected_ids)} product(s) deleted successfully.")
+            else:
+                messages.error(request, "No products were selected for deletion.")
+            
+            return redirect('product_shop:product_page')
 
-        return redirect('product_shop:product_page')
 
     return render(request, 'productshop/product_page.html', context)
