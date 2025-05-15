@@ -19,8 +19,12 @@ class CustomUserAdmin(UserAdmin):
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = super().get_fieldsets(request, obj)
-        if request.user.is_superuser:
+        if request.user.is_superuser and len(fieldsets) > 2:
+            # Safely access index 2
             fieldsets[2][1]['fields'] = ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')
         return fieldsets
 
 admin.site.register(CustomUser, CustomUserAdmin)
+
+
+

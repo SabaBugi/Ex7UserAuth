@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from .forms import CustomUserRegistrationForm
 from django.contrib import messages
 
+
 def home(request):
     return render(request, 'productshop/home.html')
 
